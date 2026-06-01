@@ -44,7 +44,7 @@ def submit(csv_path: str, message: str, competition: str = COMPETITION) -> None:
         competition=competition,
         quiet=False,
     )
-    print(f"Submitted '{csv_path}' → {competition}")
+    print(f"Submitted '{csv_path}' -> {competition}")
 
 
 def list_submissions(competition: str = COMPETITION) -> None:

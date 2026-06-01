@@ -1,0 +1,14 @@
+{
+  "id": "alexycactus/esa-nb11-l2sp-finetune",
+  "title": "ESA nb11 l2sp finetune",
+  "code_file": "nb11_l2sp_finetune.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": ["neural-debris-removal-in-streak-detection-models"],
+  "kernel_sources": [],
+  "model_sources": []
+}
