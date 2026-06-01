@@ -1,0 +1,14 @@
+{
+  "id": "alexycactus/esa-nb11v2-l2sp-corrected",
+  "title": "ESA nb11v2 l2sp corrected",
+  "code_file": "nb11v2_l2sp_corrected.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": ["neural-debris-removal-in-streak-detection-models"],
+  "kernel_sources": [],
+  "model_sources": []
+}
