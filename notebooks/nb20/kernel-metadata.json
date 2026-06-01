@@ -1,0 +1,14 @@
+{
+  "id": "alexycactus/esa-nb20-neuron-pruning",
+  "title": "ESA nb20 neuron pruning",
+  "code_file": "nb20_neuron_pruning.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": ["neural-debris-removal-in-streak-detection-models"],
+  "kernel_sources": [],
+  "model_sources": []
+}
