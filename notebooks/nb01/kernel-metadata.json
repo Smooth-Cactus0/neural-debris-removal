@@ -1,0 +1,14 @@
+{
+  "id": "alexycactus/esa-nb01-baseline-v1",
+  "title": "ESA nb01 baseline v1",
+  "code_file": "nb01_baseline_finetune.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": ["neural-debris-removal-in-streak-detection-models"],
+  "kernel_sources": [],
+  "model_sources": []
+}

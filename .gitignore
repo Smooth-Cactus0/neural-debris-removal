@@ -1,0 +1,11 @@
+# Competition data (large files, downloaded locally via Kaggle CLI)
+neural-debris-removal-in-streak-detection-models/
+
+# Local model outputs (large .pth files, TensorBoard events)
+outputs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/

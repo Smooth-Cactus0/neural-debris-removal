@@ -1,0 +1,14 @@
+{
+  "id": "alexycactus/esa-debris-nb00-poisoned-ref",
+  "title": "ESA Debris nb00 poisoned ref",
+  "code_file": "nb00_poisoned_ref.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": ["neural-debris-removal-in-streak-detection-models"],
+  "kernel_sources": [],
+  "model_sources": []
+}
