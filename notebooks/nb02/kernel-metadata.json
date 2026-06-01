@@ -1,0 +1,14 @@
+{
+  "id": "alexycactus/esa-nb02-poison-eda",
+  "title": "ESA nb02 poison eda",
+  "code_file": "nb02_poison_eda.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": ["neural-debris-removal-in-streak-detection-models"],
+  "kernel_sources": [],
+  "model_sources": []
+}

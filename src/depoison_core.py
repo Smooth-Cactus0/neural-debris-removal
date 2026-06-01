@@ -152,3 +152,136 @@ def validate_submission(df):
     assert len(df) == 2000, f"Expected 2000 rows, got {len(df)}"
     assert (df["id"].values == list(range(2000))).all(), "id column is not 0..1999"
     print(f"✓ Submission valid: {len(df)} rows, correct columns.")
+
+
+# ── Phase 1 proxy harness ──────────────────────────────────────────────────────
+
+
+def compute_iou(box_a, box_b):
+    """IoU between two [x1, y1, x2, y2] boxes."""
+    xi1 = max(box_a[0], box_b[0])
+    yi1 = max(box_a[1], box_b[1])
+    xi2 = min(box_a[2], box_b[2])
+    yi2 = min(box_a[3], box_b[3])
+    inter = max(0.0, xi2 - xi1) * max(0.0, yi2 - yi1)
+    area_a = (box_a[2] - box_a[0]) * (box_a[3] - box_a[1])
+    area_b = (box_b[2] - box_b[0]) * (box_b[3] - box_b[1])
+    union = area_a + area_b - inter
+    return inter / union if union > 0 else 0.0
+
+
+def poison_suppression_score(predictor, unlearn_dir, iou_thresh=0.2):
+    """
+    Measure how well the model suppresses poisoned detections.
+
+    For each unlearn image, find the maximum confidence among detections that
+    overlap the annotated poison box (IoU >= iou_thresh).  Returns:
+        (mean_conf, max_conf, per_image_confs)
+    Lower = better suppression.  Poisoned model => high; perfect de-poison => 0.
+    """
+    json_path = Path(unlearn_dir) / "annotations_coco.json"
+    with open(json_path) as f:
+        coco = json.load(f)
+    img_id_to_ann = {ann["image_id"]: ann for ann in coco["annotations"]}
+
+    confs = []
+    for im_info in coco["images"]:
+        img_path = Path(unlearn_dir) / im_info["file_name"]
+        ann = img_id_to_ann.get(im_info["id"])
+        if ann is None:
+            confs.append(0.0)
+            continue
+
+        bx, by, bw, bh = ann["bbox"]
+        poison_xyxy = [bx, by, bx + bw, by + bh]
+
+        im  = load_for_inference(img_path)
+        out = predictor(im)["instances"].to("cpu")
+        det_boxes = out.pred_boxes.tensor.numpy()
+        det_scores = out.scores.numpy()
+
+        best = 0.0
+        for (x1, y1, x2, y2), s in zip(det_boxes, det_scores):
+            if compute_iou([x1, y1, x2, y2], poison_xyxy) >= iou_thresh:
+                best = max(best, float(s))
+        confs.append(best)
+
+    return float(np.mean(confs)), float(np.max(confs)), confs
+
+
+def probe_preservation_score(predictor, probes_dir):
+    """
+    Measure how well the model preserves genuine streak detections on synthetic probes.
+
+    For each probe image (for which a bbox annotation exists), find the max confidence
+    among detections overlapping the annotated streak box (IoU >= 0.2).  Returns:
+        (mean_conf, per_image_confs)
+    Higher = better preservation.  Poisoned model (baseline) => high; catastrophic
+    forget => near 0.
+    """
+    json_path = Path(probes_dir) / "probes_coco.json"
+    with open(json_path) as f:
+        coco = json.load(f)
+    img_id_to_ann = {ann["image_id"]: ann for ann in coco["annotations"]}
+
+    confs = []
+    for im_info in coco["images"]:
+        img_path = Path(probes_dir) / im_info["file_name"]
+        ann = img_id_to_ann.get(im_info["id"])
+        if ann is None:
+            confs.append(0.0)
+            continue
+
+        bx, by, bw, bh = ann["bbox"]
+        streak_xyxy = [bx, by, bx + bw, by + bh]
+
+        im  = load_for_inference(img_path)
+        out = predictor(im)["instances"].to("cpu")
+        det_boxes  = out.pred_boxes.tensor.numpy()
+        det_scores = out.scores.numpy()
+
+        best = 0.0
+        for (x1, y1, x2, y2), s in zip(det_boxes, det_scores):
+            if compute_iou([x1, y1, x2, y2], streak_xyxy) >= 0.2:
+                best = max(best, float(s))
+        confs.append(best)
+
+    return float(np.mean(confs)), confs
+
+
+def proxy_score(predictor, predictor_ref, unlearn_dir, probes_dir,
+                preserve_weight=10.0):
+    """
+    Combined proxy score (higher = better de-poisoning).
+
+    proxy = suppression_gain - preserve_weight * preservation_loss
+
+    where:
+        suppression_gain = ref_poison_conf - now_poison_conf  (want > 0)
+        preservation_loss = max(0, ref_probe_conf - now_probe_conf)  (want = 0)
+
+    preserve_weight=10 mirrors the maCADD A=10 asymmetry: harming clean streak
+    detection is 10× more costly than over-suppressing poison.
+
+    predictor_ref = the poisoned model (baseline reference).
+    predictor     = the de-poisoned model being evaluated.
+    """
+    ref_supp, _, _ = poison_suppression_score(predictor_ref, unlearn_dir)
+    now_supp, _, _ = poison_suppression_score(predictor,     unlearn_dir)
+    suppression_gain = ref_supp - now_supp  # positive = we suppressed poison
+
+    ref_pres, _ = probe_preservation_score(predictor_ref, probes_dir)
+    now_pres, _ = probe_preservation_score(predictor,     probes_dir)
+    preservation_loss = max(0.0, ref_pres - now_pres)  # positive = we hurt preservation
+
+    proxy = suppression_gain - preserve_weight * preservation_loss
+
+    return {
+        "proxy":              proxy,
+        "suppression_gain":   suppression_gain,
+        "suppression_ref":    ref_supp,
+        "suppression_now":    now_supp,
+        "preservation_loss":  preservation_loss,
+        "preservation_ref":   ref_pres,
+        "preservation_now":   now_pres,
+    }
