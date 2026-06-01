@@ -1,0 +1,14 @@
+{
+  "id": "alexycactus/esa-nb01b-baseline-seed42",
+  "title": "ESA nb01b Baseline SEED42",
+  "code_file": "nb01b_baseline_seed42.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": ["neural-debris-removal-in-streak-detection-models"],
+  "kernel_sources": [],
+  "model_sources": []
+}

@@ -1,0 +1,14 @@
+{
+  "id": "alexycactus/esa-nb22-task-vector-negation",
+  "title": "ESA nb22 Task Vector Negation",
+  "code_file": "nb22_task_vector_negation.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": ["neural-debris-removal-in-streak-detection-models"],
+  "kernel_sources": [],
+  "model_sources": []
+}
