@@ -1,0 +1,14 @@
+{
+  "id": "alexycactus/esa-nb10-freeze-finetune",
+  "title": "ESA nb10 freeze finetune",
+  "code_file": "nb10_freeze_finetune.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": ["neural-debris-removal-in-streak-detection-models"],
+  "kernel_sources": [],
+  "model_sources": []
+}
