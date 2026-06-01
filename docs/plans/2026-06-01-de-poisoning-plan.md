@@ -38,21 +38,14 @@ claim success without the printed evidence. Use `superpowers:verification-before
 
 ## Phase 0 — Foundation & de-risk
 
-### Task 0.0: Create the `esa` Git remote + repo scaffolding
+### Task 0.0: ✅ DONE (brain session) — `esa` remote + scaffolding
 
-**Files:**
-- Modify: global `MEMORY.md` push table (add `esa` row)
-- Create: `Kaggle competition/ESA_comp/notebooks/` (kernel sources live here)
-- Create: `Kaggle competition/ESA_comp/src/` (reusable modules)
+Already completed by the brain session:
+- Public repo `Smooth-Cactus0/neural-debris-removal` created; remote alias `esa` added.
+- MEMORY.md push table updated with the `esa` row.
+- CLAUDE.md, docs/, plan committed + subtree-pushed.
 
-**Steps:**
-1. Create public GitHub repo `neural-debris-removal` under the user's account.
-2. From git root `Claude_projects/`, add subtree remote alias `esa`. Record in MEMORY.md:
-   `| esa | neural-debris-removal | Kaggle competition/ESA_comp |`.
-3. Commit the existing `CLAUDE.md`, `docs/`, `.claude/agents/` scaffolding.
-4. **Verify:** `git remote -v | grep esa` shows the remote; `MEMORY.md` table updated.
-
-> NOTE: needs the user's GitHub. If blocked, proceed with local commits and flag the remote as TODO.
+You only need to create `notebooks/` and `src/` as you build, and push-to-both after milestones.
 
 ---
 

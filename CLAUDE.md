@@ -79,8 +79,8 @@ empty string as null). x,y = top-left corner (0-indexed), w,h in pixels.
   write the production notebooks — a separate **coding-agent session** does, using the
   `/kaggle-workflow` skill, driven by the plan we produce here.
 - Git root is `Claude_projects/` (shared across all projects, shared `MEMORY.md`).
-- Kaggle remote alias for this project: **not yet created** — TODO before first push (see
-  push-workflow rule in MEMORY.md; pick alias `esa` / repo name TBD).
+- Git remote: alias **`esa`** → `Smooth-Cactus0/neural-debris-removal` (public). Push-to-both per
+  MEMORY.md: `git push origin master` + `git subtree push --prefix="Kaggle competition/ESA_comp" esa master`.
 - Plans live in `docs/plans/`. Research notes in `docs/`.
 
 ## Kaggle gotchas that apply here (from MEMORY.md — read those too)
