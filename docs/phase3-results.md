@@ -21,14 +21,15 @@ No freeze/anchor/prune knob tried can break this coupling.
 
 ## Confirmed LB anchor map (2026-06-02)
 
-| Submission | LB (maCADD) | Test dets | Note |
-|-----------|-------------|-----------|------|
-| Poisoned reference (nb00) | **379.05** | 2593 | Matches public notebook ✓ |
-| nb10 (freeze = collapsed) | 284.49 | ~0 | Empty floor proxy |
-| nb01b (SEED=42 baseline) | **260.67** | 1874 | Same as nb01's 259.79 — SEED doesn't change LB |
-| nb01 (SEED=-1 baseline)  | 259.79 | 1866 | Stable, non-determinism is only noise |
-| Public cluster | ~223.5 | ? | Recipe unknown — NOT nb01 with SEED |
-| Winner | 185.7 | ? | |
+| Submission | LB (maCADD) | Dets/img | Proxy | Note |
+|-----------|-------------|----------|-------|------|
+| Poisoned reference (nb00) | **379.05** | 1.296 | 0 | Matches public notebook ✓ |
+| Empty reference | **284.20** | 0.000 | ∞ | Confirmed floor |
+| nb10 (freeze = collapsed) | 284.49 | ~0 | — | Also at empty floor |
+| nb01 / nb01b baseline | 259–261 | 0.937 | 626 | SEED makes no difference |
+| **baseline@floor=0.3** | **248.15** | 0.660 | 758 | **New best — calibration works** |
+| Public cluster | ~223.5 | ? | — | Recipe unknown — NOT nb01 with SEED |
+| Winner | 185.7 | ? | — | |
 
 **Key finding**: SEED=42 had NO effect on LB (260.67 vs 259.79). The 223.5 cluster uses a different
 training recipe — investigate the roadmap-to-226 public notebook.
@@ -135,12 +136,12 @@ Over-suppression (dets/img << clean's ~1.5/img) will eventually degrade LB towar
 
 ### Submission plan (deferred — both slots used today)
 
-| Priority | File | Dets/img | Proxy | Rationale |
-|----------|------|----------|-------|-----------|
-| **Tomorrow slot 1** | empty_ref/submission.csv | 0.000 | ∞ | Confirm 284 floor |
-| **Tomorrow slot 2** | nb40/nb40_base_f03_kall.csv | 0.660 | 758 | Unlearn+calibrate |
-| Day+2 slot 3 | nb40/nb40_raw_f05_kall.csv | 0.725 | 388 | Pure calibration diagnostic |
-| Day+2 slot 4 | nb40/nb40_base_f04_k1.csv | 0.349 | 1001 | Aggressive calibration |
+| Priority | File | Dets/img | Proxy | LB (actual or est.) |
+|----------|------|----------|-------|---------------------|
+| ~~slot 1~~ | empty_ref/submission.csv | 0.000 | ∞ | **284.20** ✓ |
+| ~~slot 2~~ | nb40/nb40_base_f03_kall.csv | 0.660 | 758 | **248.15** ✓ |
+| **Tomorrow slot 3** | nb40/nb40_raw_f05_kall.csv | 0.725 | 388 | ~280? (pure calib.) |
+| **Tomorrow slot 4** | nb40/nb40_base_f04_k1.csv | 0.349 | 1001 | ~220-240? |
 
 **Key open question**: Does poisoned@0.5 beat 260? If YES, pure calibration is the main lever.
 If NO, unlearning is essential.
