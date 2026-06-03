@@ -80,6 +80,18 @@ Trend so far: poisoned 1.30/img→379; baseline 0.93/img→260. Fewer dets → b
 calibration band is **0.2→0.6** on already-filtered output. nb40 should sweep this on BOTH raw
 poisoned and the baseline CSV.
 
+## ⚠️ Submission budget = 2/day (scarce) + proxy caveat
+
+- Only **2 LB submissions per day**. Plan 1-2 high-value experiments/day; never burn a slot on a
+  point a cheaper test could rule out.
+- **The local proxy `maCADD(candidate, poisoned)` does NOT rank confidence-threshold variants** —
+  raising the floor increases divergence from poisoned (deleting its detections) yet may *lower* the
+  true LB (closeness to clean). Use the proxy only as a **regression guard** (did we accidentally
+  move away from poisoned on the ~1980 clean images?), and find the threshold optimum via a frugal
+  **1-D LB search on our best model**, not a grid.
+- Day-1 best 2 bets: `baseline@0.5` and `baseline@0.6` (map our best model's calibration curve);
+  Day-2 refine in the winning direction (0.4 or 0.7). Defer raw-poisoned isolation unless slots free.
+
 ## Open checks
 - Submit the empty reference once to confirm the ~284 floor on OUR account.
 - Confirm clean's detection density indirectly via the threshold sweep (which floor minimises LB).
