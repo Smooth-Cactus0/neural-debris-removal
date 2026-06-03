@@ -63,6 +63,23 @@ low-confidence*. **Two poison effects:** (a) strong detection of the planted str
 3. **Unlearn** (P4): light task-negation under calibration → push toward ~185.
 Score everything locally with P2's metric proxy before each LB submit.
 
+## Local preview (brain session, on sample_submission.csv = poisoned >0.2)
+
+Poisoned SUBMITTED output is already sparse (the 4.1/img figure was conf>0.05 raw):
+`1.30 dets/img, conf median 0.536, min 0.200, max 0.984`. Density vs floor:
+
+| floor | dets/img | imgs with 0 dets |
+|---|---|---|
+| 0.2 | 1.30 | 634 |
+| 0.4 | 0.90 | 815 |
+| 0.5 | 0.72 | 972 |
+| 0.6 | 0.53 | 1170 |
+| 0.7 | 0.35 | 1419 |
+
+Trend so far: poisoned 1.30/img→379; baseline 0.93/img→260. Fewer dets → better. The live
+calibration band is **0.2→0.6** on already-filtered output. nb40 should sweep this on BOTH raw
+poisoned and the baseline CSV.
+
 ## Open checks
 - Submit the empty reference once to confirm the ~284 floor on OUR account.
 - Confirm clean's detection density indirectly via the threshold sweep (which floor minimises LB).
