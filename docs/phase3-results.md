@@ -136,12 +136,57 @@ Over-suppression (dets/img << clean's ~1.5/img) will eventually degrade LB towar
 
 ### Submission plan (deferred — both slots used today)
 
-| Priority | File | Dets/img | Proxy | LB (actual or est.) |
-|----------|------|----------|-------|---------------------|
+| Priority | File | Dets/img | Proxy | LB |
+|----------|------|----------|-------|----|
 | ~~slot 1~~ | empty_ref/submission.csv | 0.000 | ∞ | **284.20** ✓ |
 | ~~slot 2~~ | nb40/nb40_base_f03_kall.csv | 0.660 | 758 | **248.15** ✓ |
-| **Tomorrow slot 3** | nb40/nb40_raw_f05_kall.csv | 0.725 | 388 | ~280? (pure calib.) |
-| **Tomorrow slot 4** | nb40/nb40_base_f04_k1.csv | 0.349 | 1001 | ~220-240? |
+| ~~slot 3~~ | nb40/nb40_raw_f05_kall.csv | 0.725 | 388 | **298.34** — raw calib FAILS |
+| ~~slot 4~~ | nb40/nb40_raw_f06_kall.csv | 0.532 | 599 | **283.54** — essentially empty floor |
+| **Next slot 5** | nb40/nb40_base_f04_k1.csv | 0.349 | 1001 | pending |
+| Next slot 6 | nb40/nb40_base_f05_kall.csv | 0.264 | 1067 | pending |
+
+### Raw calibration hypothesis: REJECTED
+
+Fine-tuning IS essential. Raw@0.5 (0.725/img) = 298.34 vs baseline@0.3 (0.660/img) = 248.15.
+Same detection density, but raw model retains poison activations that count as FPs against clean.
+Unlearning selectively suppresses the poison anchor; raw thresholding cannot discriminate it.
+
+## P3 — Morphological dashedness filter (2026-06-04)
+
+### Implementation: src/morphology.py
+Algorithm: crop bbox → bright pixel mask (mean + k*std) → PCA → project → gap fraction along PC1.
+
+### Calibration results
+
+| Set | n | Mean gap | Std | AUC vs each other |
+|-----|---|---------|-----|-------------------|
+| Poison (unlearn) | 20 | 0.385 | 0.211 | 0.639 |
+| Synthetic probes | 40 | 0.000 | 0.000 | (all continuous) |
+| Real test (conf≥0.4) | 60 | 0.279 | 0.190 | — |
+
+**Key finding: Synthetic probes are too idealized.** All 40 have gap_fraction=0.000 (perfect Gaussian
+streaks). Real test detections have gap_fraction=0.279 — nearly as high as poison (0.385).
+Poison vs real-test AUC = 0.639. Marginal — not usable as a standalone filter.
+
+**Root cause:** Real satellite/meteor streaks also appear "dashed" in 16-bit images due to noise
+and the bbox including sky background that falls below threshold. The probe-based calibration
+(threshold=0.005) would drop 87% of real test detections as false positives.
+
+### Best separation config: gap8_k2.0 (gap_min_px=8, bright_k=2.0)
+Poison mean=0.214, Real mean=0.092, AUC=0.639 — best but still marginal.
+
+### Jason's roadmap insight
+"You can't just filter by shape" — the roadmap explicitly states morphological filtering is
+an enhancement, not a primary filter. His ~219 was achieved as: unlearn → calibrate → filter.
+Bbox area ≠ discriminant: poison annotations span 168–2235 px² (median 785), no tight cluster.
+Predictions at conf>0.2 span P10=387 to P90=2032 — no fixed anchor scale visible.
+
+### P3 conclusion
+The dashedness filter needs a better reference set than synthetic probes. Option:
+- Use the 20 ACTUAL poison boxes as positive examples
+- Use baseline's high-conf (>0.6) test detections as negative examples (more realistic than probes)
+- Re-calibrate with the real reference → likely improves AUC
+Not yet submitted — need better calibration before investing a submission slot.
 
 **Key open question**: Does poisoned@0.5 beat 260? If YES, pure calibration is the main lever.
 If NO, unlearning is essential.
