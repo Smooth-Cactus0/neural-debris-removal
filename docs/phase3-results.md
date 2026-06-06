@@ -27,9 +27,15 @@ No freeze/anchor/prune knob tried can break this coupling.
 | Empty reference | **284.20** | 0.000 | ∞ | Confirmed floor |
 | nb10 (freeze = collapsed) | 284.49 | ~0 | — | Also at empty floor |
 | nb01 / nb01b baseline | 259–261 | 0.937 | 626 | SEED makes no difference |
-| **baseline@floor=0.3** | **248.15** | 0.660 | 758 | **New best — calibration works** |
-| Public cluster | ~223.5 | ? | — | Recipe unknown — NOT nb01 with SEED |
+| baseline@floor=0.3 | 248.15 | 0.660 | 758 | |
+| **baseline@floor=0.5** | **246.37** | 0.264 | 1067 | **New best (2026-06-06)** |
+| baseline@floor=0.4 K=1 | 252.12 | 0.349 | 1001 | K=1 cap HURTS vs all-K |
+| Podium cutoff (#3) | 211.64 | ? | — | Target — 35 pts below best |
 | Winner | 185.7 | ? | — | |
+
+**Calibration finding (2026-06-06)**: K=1 cap consistently hurts vs all-K at the same floor.
+Floor=0.5 (0.264/img) beats floor=0.3 (0.660/img) — trend still falling, but slowly (−1.78).
+Calibration alone cannot close the 35-pt gap to podium. Weight-edit is the required next lever.
 
 **Key finding**: SEED=42 had NO effect on LB (260.67 vs 259.79). The 223.5 cluster uses a different
 training recipe — investigate the roadmap-to-226 public notebook.
@@ -142,8 +148,8 @@ Over-suppression (dets/img << clean's ~1.5/img) will eventually degrade LB towar
 | ~~slot 2~~ | nb40/nb40_base_f03_kall.csv | 0.660 | 758 | **248.15** ✓ |
 | ~~slot 3~~ | nb40/nb40_raw_f05_kall.csv | 0.725 | 388 | **298.34** — raw calib FAILS |
 | ~~slot 4~~ | nb40/nb40_raw_f06_kall.csv | 0.532 | 599 | **283.54** — essentially empty floor |
-| **Next slot 5** | nb40/nb40_base_f04_k1.csv | 0.349 | 1001 | pending |
-| Next slot 6 | nb40/nb40_base_f05_kall.csv | 0.264 | 1067 | pending |
+| ~~slot 5~~ | nb40/nb40_base_f04_k1.csv | 0.349 | 1001 | **252.12** — K=1 HURTS (+3.97 vs all-K) |
+| ~~slot 6~~ | nb40/nb40_base_f05_kall.csv | 0.264 | 1067 | **246.37** ← NEW BEST |
 
 ### Raw calibration hypothesis: REJECTED
 
