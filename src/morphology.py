@@ -225,6 +225,83 @@ def analyze_unlearn_set(
     return results
 
 
+def analyze_test_detections(
+    submission_df: pd.DataFrame,
+    test_dir: str | Path,
+    min_conf: float = 0.5,
+    max_samples: int = 80,
+    seed: int = 42,
+    exclude_image_ids: set | None = None,
+    verbose: bool = True,
+) -> list[dict]:
+    """
+    Compute dashedness on high-confidence non-poison test detections.
+
+    These serve as the REAL (negative) reference for calibrating the dashedness filter.
+    Uses only the model's own predictions for analysis — fully compliant (no test labels).
+
+    Parameters
+    ----------
+    submission_df     : DataFrame with columns [id, image_id, prediction_string]
+    test_dir          : directory containing test PNG files
+    min_conf          : minimum confidence for a detection to be sampled
+    max_samples       : max number of real detections to analyse
+    seed              : RNG seed for reproducible sampling
+    exclude_image_ids : image IDs to skip (e.g. the 20 unlearn images which may contain poison)
+    """
+    import random as _random
+    rng = _random.Random(seed)
+    test_dir = Path(test_dir)
+    if exclude_image_ids is None:
+        exclude_image_ids = set()
+
+    candidates = []
+    for _, row in submission_df.iterrows():
+        img_id = int(row["image_id"])
+        if img_id in exclude_image_ids:
+            continue
+        ps = str(row["prediction_string"]).strip()
+        if not ps or ps == " ":
+            continue
+        vals = ps.split()
+        for i in range(0, len(vals), 5):
+            conf = float(vals[i])
+            if conf >= min_conf:
+                x, y, w, h = float(vals[i+1]), float(vals[i+2]), float(vals[i+3]), float(vals[i+4])
+                candidates.append({"image_id": img_id, "bbox": [x, y, w, h], "conf": conf})
+
+    rng.shuffle(candidates)
+    selected = candidates[:max_samples]
+
+    results = []
+    if verbose:
+        print(f"\n=== Dashedness — REAL TEST DETS (n={len(selected)}, conf>={min_conf}) ===")
+        print(f"{'ImgID':<8} {'Conf':>6} {'Gap%':>7} {'nBright':>8} {'Linear':>8} {'PLen':>7}")
+        print("-" * 50)
+
+    for c in selected:
+        img_path = test_dir / f"{c['image_id']}.png"
+        r = dashedness_score(img_path, c["bbox"])
+        r["image_id"] = c["image_id"]
+        r["conf"] = c["conf"]
+        r["source"] = "real"
+        results.append(r)
+        if verbose:
+            gf = f"{r['gap_fraction']:.4f}" if r["ok"] else "   NaN"
+            ln = f"{r['linearity']:.4f}" if r["ok"] else "   NaN"
+            pl = f"{r['principal_len']:.1f}" if r["ok"] else "   NaN"
+            print(f"{c['image_id']:<8} {c['conf']:>6.3f} {gf:>7} {r['n_bright']:>8} {ln:>8} {pl:>7}")
+
+    valid = [r for r in results if r["ok"]]
+    if valid and verbose:
+        gfs = [r["gap_fraction"] for r in valid]
+        print(f"\n  Mean gap fraction (real test) : {np.mean(gfs):.4f}")
+        print(f"  Std                           : {np.std(gfs):.4f}")
+        print(f"  Min / Max                     : {np.min(gfs):.4f} / {np.max(gfs):.4f}")
+
+    return results
+
+
 def analyze_probes(
     probes_dir: str | Path,
     coco_json_path: str | Path | None = None,
