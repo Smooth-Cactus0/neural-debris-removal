@@ -28,14 +28,20 @@ No freeze/anchor/prune knob tried can break this coupling.
 | nb10 (freeze = collapsed) | 284.49 | ~0 | — | Also at empty floor |
 | nb01 / nb01b baseline | 259–261 | 0.937 | 626 | SEED makes no difference |
 | baseline@floor=0.3 | 248.15 | 0.660 | 758 | |
-| **baseline@floor=0.5** | **246.37** | 0.264 | 1067 | **New best (2026-06-06)** |
+| baseline@floor=0.5 | 246.37 | 0.264 | 1067 | calibration exhausted |
 | baseline@floor=0.4 K=1 | 252.12 | 0.349 | 1001 | K=1 cap HURTS vs all-K |
-| Podium cutoff (#3) | 211.64 | ? | — | Target — 35 pts below best |
+| P3 gap>=0.56 (lo10fp) | 245.97 | 0.818 | — | shape filter marginal gain |
+| **P3 gap>=0.50 (lo20fp)** | **238.51** | 0.752 | 775.5 | **Best (2026-06-07) — shape works** |
+| P3 gap>=0.40 (Day2 sub1) | pending | 0.625 | 869.7 | more aggressive |
+| P3 gap>=0.50 + rescue | pending | 0.833 | 712.6 | rescue 162 zero-det imgs |
+| Podium cutoff (#3) | 211.64 | ? | — | Target — 27 pts below best |
 | Winner | 185.7 | ? | — | |
 
-**Calibration finding (2026-06-06)**: K=1 cap consistently hurts vs all-K at the same floor.
-Floor=0.5 (0.264/img) beats floor=0.3 (0.660/img) — trend still falling, but slowly (−1.78).
-Calibration alone cannot close the 35-pt gap to podium. Weight-edit is the required next lever.
+**P3 finding (2026-06-07)**: Dashedness filter IS working. lo20fp beats lo10fp by 7.5 pts (238 vs 246).
+More aggressive = better. Shape (gap fraction along PCA axis) correctly identifies poison-dashed dets.
+Calibration (poison mean=0.385 vs real mean=0.296, sep=+0.089): weak but real signal at scale (1866 dets).
+
+## P3 — Morphological dashedness filter (Day 1, 2026-06-07)
 
 **Key finding**: SEED=42 had NO effect on LB (260.67 vs 259.79). The 223.5 cluster uses a different
 training recipe — investigate the roadmap-to-226 public notebook.
